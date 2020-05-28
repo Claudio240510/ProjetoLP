@@ -1,5 +1,3 @@
-package TrabalhoLP;
-
 public class Ligacao{
 
 	protected double horas;
@@ -51,3 +49,4 @@ public class Ligacao{
 	}
 
 }
+
