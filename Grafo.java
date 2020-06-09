@@ -22,8 +22,8 @@ import java.util.Set;
 
 	// Getters e setters
 
-	public void addCidade(Cidade n) {
-		cidades.addAll(Arrays.asList(n));
+	public void addCidade(Cidade cidade){
+		cidades.addAll(Arrays.asList(cidade));
 	}
 
 	public void addLigacao(Cidade origem, Cidade destino, double horas) {
@@ -37,16 +37,13 @@ import java.util.Set;
 		}
 	}
 
-	private void adicionaLigacao(Cidade a, Cidade b, double horas) {
-		for (Ligacao ligacao : a.ligacoes) {
-			if (ligacao.getOrigem() == a && ligacao.getDestino() == b) {
-
+	private void adicionaLigacao(Cidade cidade1, Cidade cidade2, double horas) {
+		for (Ligacao ligacao : cidade1.ligacoes) {
+			if (ligacao.getOrigem() == cidade1 && ligacao.getDestino() == cidade2) {
 				ligacao.horas = horas;
-				return;
 			}
 		}
-
-		a.ligacoes.add(new Ligacao(a, b, horas));
+		cidade1.ligacoes.add(new Ligacao(cidade1, cidade2, horas));
 	}
 
 	public void imprimeLigacoes() {
@@ -56,23 +53,20 @@ import java.util.Set;
 			if (ligacoes.isEmpty()) {
 				System.out.println("A Cidade " + cidade.getNome() + " não tem voos disponíveis.");
 				continue;
-			}
+			}else {
 			System.out.print("A Cidade " + cidade.getNome() + " tem voo para ");
-
+			}
 			for (Ligacao ligacao : ligacoes) {
 				System.out.print(ligacao.getDestino().getNome() + " Duração Voo: " + ligacao.getHoras() + " horas  ");
 			}
-			System.out.println();
 		}
 	}
 
 	public boolean temLigacao(Cidade origem, Cidade destino) {
 		LinkedList<Ligacao> ligacoes = origem.ligacoes;
 		for (Ligacao ligacao : ligacoes) {
-
-			if (ligacao.getDestino() == destino) {
-				return true;
-			}
+			if (ligacao.getDestino() == destino) 
+			return true;		
 		}
 		return false;
 	}
@@ -88,16 +82,13 @@ import java.util.Set;
 	}
 	
 	private Cidade cidadeVizinhaPorVisitar(HashMap<Cidade, Double> caminhoMaisCurto) {
-		double menorDistancia = 1000000000000000.0;
+		double menorDistancia =  10000000000000.0;
 		Cidade cidadeMaisProxima = null;
 		for (Cidade cidade : cidades) {
-			if (cidade.isFoiVisitado())
-				continue;
-			
 			double distanciaAtual = caminhoMaisCurto.get(cidade);
-			if (distanciaAtual == 1000000000000000.0)
+			
+			if (cidade.isFoiVisitado() && distanciaAtual ==  10000000000000.0)
 				continue;
-
 			if (distanciaAtual < menorDistancia) {
 				menorDistancia = distanciaAtual;
 				cidadeMaisProxima = cidade;
@@ -105,5 +96,6 @@ import java.util.Set;
 		}
 		return cidadeMaisProxima;
 	}
+	
 
 }
