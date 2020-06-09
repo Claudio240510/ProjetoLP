@@ -47,6 +47,12 @@ public class Ligacao{
 	public Cidade getOrigem() {
 		return origem;
 	}
+	
+	@Override
+	public String toString() {
+		return "Ligacao [horas=" + horas + ", origem=" + origem + ", destino=" + destino + "]";
+	}
+	
 
 }
 
