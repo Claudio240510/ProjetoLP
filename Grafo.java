@@ -8,6 +8,7 @@ import java.util.Set;
 	public class Grafo {
 		private Set<Cidade> cidades;
 		private boolean grafoDirecionado;
+	}
 
 	// Construtores
 	public Grafo(boolean grafoDirecionado) {
