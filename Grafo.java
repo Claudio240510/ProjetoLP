@@ -104,20 +104,24 @@ import java.util.Set;
 	}
 	
 	private Cidade cidadeVizinhaPorVisitar(HashMap<Cidade, Double> caminhoMaisCurto) {
-		double menorDistancia =  10000000000000.0;
+
+		double menorDistancia = 1000000000000000.0;
 		Cidade cidadeMaisProxima = null;
+
 		for (Cidade cidade : cidades) {
-			double distanciaAtual = caminhoMaisCurto.get(cidade);
-			
-			if (cidade.isFoiVisitado() && distanciaAtual ==  10000000000000.0)
+			if (cidade.isFoiVisitado())
 				continue;
-			if (distanciaAtual < menorDistancia) {
+
+			double distanciaAtual = caminhoMaisCurto.get(cidade);
+			if (distanciaAtual == 1000000000000000.0)
+				continue;
+
+			if (menorDistancia > distanciaAtual) {
 				menorDistancia = distanciaAtual;
 				cidadeMaisProxima = cidade;
 			}
 		}
 		return cidadeMaisProxima;
 	}
-	
 
 }
