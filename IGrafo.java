@@ -1,18 +1,12 @@
 public interface IGrafo {
 
-	public void addCidade(Cidade cidade);
+	public int addCidade(String nome);
 	
-	public void removeCidade(Cidade cidade);
-	
-	public void addLigacao(Cidade origem, Cidade destino, double horas);
-	
-	public void adicionaLigacao(Cidade cidade1, Cidade cidade2, double horas);
+	public void RemoverCidade(Cidade n);
 
-	public void imprimeLigacoes();
+	public void encontraMenorCaminho(Cidade origem);
 
-	public boolean temLigacao(Cidade origem, Cidade destino);
-	
-	public void encontraMenorCaminho(Cidade origem, Cidade destino);
-	
+	public List<Cidade> criarCaminho(Cidade destino);
+
 }
 
