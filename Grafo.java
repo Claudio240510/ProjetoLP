@@ -1,11 +1,10 @@
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-	public class Grafo {
+	public class Grafo implements IGrafo {
 		private Set<Cidade> cidades;
 		private boolean grafoDirecionado;
 	
@@ -21,11 +20,30 @@ import java.util.Set;
 	}
 
 	// Getters e setters
+		
+	public Set<Cidade> getCidades() {
+		return cidades;
+	}
 
+	public void setCidades(Set<Cidade> cidades) {
+		this.cidades = cidades;
+	}
+
+	public boolean isGrafoDirecionado() {
+		return grafoDirecionado;
+	}
+
+	public void setGrafoDirecionado(boolean grafoDirecionado) {
+		this.grafoDirecionado = grafoDirecionado;
+	}
+	
+	// Métodos
+	@Override
 	public void addCidade(Cidade cidade){
 		cidades.addAll(Arrays.asList(cidade));
 	}
-
+		
+	@Override
 	public void addLigacao(Cidade origem, Cidade destino, double horas) {
 		cidades.add(origem);
 		cidades.add(destino);
@@ -36,8 +54,9 @@ import java.util.Set;
 			adicionaLigacao(destino, origem, horas);
 		}
 	}
-
-	private void adicionaLigacao(Cidade cidade1, Cidade cidade2, double horas) {
+		
+	@Override
+	public void adicionaLigacao(Cidade cidade1, Cidade cidade2, double horas) {
 		for (Ligacao ligacao : cidade1.ligacoes) {
 			if (ligacao.getOrigem() == cidade1 && ligacao.getDestino() == cidade2) {
 				ligacao.horas = horas;
@@ -45,7 +64,8 @@ import java.util.Set;
 		}
 		cidade1.ligacoes.add(new Ligacao(cidade1, cidade2, horas));
 	}
-
+		
+	@Override
 	public void imprimeLigacoes() {
 		for (Cidade cidade : cidades) {
 			LinkedList<Ligacao> ligacoes = cidade.ligacoes;
@@ -61,7 +81,8 @@ import java.util.Set;
 			}
 		}
 	}
-
+		
+	@Override
 	public boolean temLigacao(Cidade origem, Cidade destino) {
 		LinkedList<Ligacao> ligacoes = origem.ligacoes;
 		for (Ligacao ligacao : ligacoes) {
@@ -71,6 +92,7 @@ import java.util.Set;
 		return false;
 	}
 		
+	@Override	
 	public void encontraMenorCaminho(Cidade origem, Cidade destino) {
 	
 	}
