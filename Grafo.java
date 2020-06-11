@@ -14,7 +14,7 @@ public class Grafo implements IGrafo {
 	}
 	
 	@Override
-	public void RemoverCidade(Cidade n) {
+	public void removerCidade(Cidade n) {
 		cidades.remove(n);
 	}
 
