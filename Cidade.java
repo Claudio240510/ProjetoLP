@@ -1,21 +1,17 @@
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-
-public class Cidade implements Comparable<Cidade> {
+public class Cidade implements Comparable<Cidade>  {
 
 	private String nome;
-	private int distancia = 0;
-	private boolean foiVisitado;
-	LinkedList<Ligacao> ligacoes;
-
+	private List<Ligacao> ligacoes = new ArrayList<>();
+	private double distanciaMinima = Double.POSITIVE_INFINITY;
+	private double distanciaMaxima = Double.NEGATIVE_INFINITY;
+	private Cidade cidadeAnterior;
+	
 	// Construtores
 
-	public Cidade(int distancia, String nome) {
-		this.nome = nome;
-		this.distancia = distancia;
-		foiVisitado = false;
-		ligacoes = new LinkedList<>();
+	public Cidade(String nome) {
+		this.nome = nome;		
 	}
 
 	// Getters e setters
@@ -27,55 +23,46 @@ public class Cidade implements Comparable<Cidade> {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-
-	public double getDistancia() {
-		return distancia;
+	
+	public double getDistanciaMinima() {
+		return distanciaMinima;
 	}
 
-	public void setDistancia(int distancia) {
-		this.distancia = distancia;
+	public void setDistanciaMinima(double distanciaMinima) {
+		this.distanciaMinima = distanciaMinima;
+	}
+	
+	public double getDistanciaMaxima() {
+		return distanciaMaxima;
 	}
 
-	public boolean isFoiVisitado() {
-		return foiVisitado;
+	public void setDistanciaMaxima(double distanciaMaxima) {
+		this.distanciaMaxima = distanciaMaxima;
+	}
+	
+	public Cidade getCidadeAnterior() {
+		return cidadeAnterior;
 	}
 
-	public void visitar() {
-		this.foiVisitado = true;
+	public void setCidadeAnterior(Cidade cidadeAnterior) {
+		this.cidadeAnterior = cidadeAnterior;
 	}
-
-	public void naoVisitado() {
-		foiVisitado = false;
+	
+	public List<Ligacao> getLigacoes(){
+		return ligacoes;
 	}
-
+	
+	public void addLigacao(Ligacao l) {	
+		ligacoes.add(l);	
+	}
+	
 	public int compareTo(Cidade cidade) {
-
-		if (this.getDistancia() < cidade.getDistancia())
-			return -1;
-
-		else if (this.getDistancia() == cidade.getDistancia()) {
-			return 0;
-		} else {
-			return 1;
-		}
+		return Double.compare(distanciaMinima, cidade.getDistanciaMinima());	
 	}
-
-	public int compareTo(Cidade cidade1, Cidade cidade2) {
-
-		if (cidade1.getDistancia() < cidade2.getDistancia()) {
-			return -1;
-		}
-		if (cidade1.getDistancia() > cidade2.getDistancia()) {
-			return 1;
-		} else {
-			return 0;
-		}
-	}
-
+	
 	@Override
 	public String toString() {
-		return "Cidade [nome=" + nome + ", distancia=" + distancia + ", foiVisitado=" + foiVisitado + ", ligacoes="
-				+ ligacoes + "]";
+		return "Cidade: " + nome ;
 	}
 
 }
