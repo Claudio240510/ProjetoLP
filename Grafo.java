@@ -1,126 +1,50 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-	public class Grafo implements IGrafo {
-		private Set<Cidade> cidades;
-		private boolean grafoDirecionado;
-	
+public class Grafo implements IGrafo {
 
-	// Construtores
-	public Grafo(boolean grafoDirecionado) {
-		this.grafoDirecionado = grafoDirecionado;
+	private Set<Cidade> cidades;
+	private PriorityQueue<Cidade> queueCidade = new PriorityQueue<>();
+
+	public Grafo() {
 		cidades = new HashSet<>();
 	}
-	
-	public Grafo() {
-		grafoDirecionado=true;
-	}
-
-	// Getters e setters
-		
-	public Set<Cidade> getCidades() {
-		return cidades;
-	}
-
-	public void setCidades(Set<Cidade> cidades) {
-		this.cidades = cidades;
-	}
-
-	public boolean isGrafoDirecionado() {
-		return grafoDirecionado;
-	}
-
-	public void setGrafoDirecionado(boolean grafoDirecionado) {
-		this.grafoDirecionado = grafoDirecionado;
+	@Override
+	public void addCidade(Cidade n) {
+		cidades.add(n);
 	}
 	
-	// Métodos
 	@Override
-	public void addCidade(Cidade cidade){
-		cidades.addAll(Arrays.asList(cidade));
-	}
-		
-	@Override	
-	public void removeCidade(Cidade cidade) {
-		cidades.removeAll(Arrays.asList(cidade));
+	public void RemoverCidade(Cidade n) {
+		cidades.remove(n);
 	}
 
-		
 	@Override
-	public void addLigacao(Cidade origem, Cidade destino, double horas) {
-		cidades.add(origem);
-		cidades.add(destino);
-
-		adicionaLigacao(origem, destino, horas);
-
-		if (grafoDirecionado && origem == destino) {
-			adicionaLigacao(destino, origem, horas);
-		}
-	}
-		
-	@Override
-	public void adicionaLigacao(Cidade cidade1, Cidade cidade2, double horas) {
-		for (Ligacao ligacao : cidade1.ligacoes) {
-			if (ligacao.getOrigem() == cidade1 && ligacao.getDestino() == cidade2) {
-				ligacao.horas = horas;
-			}
-		}
-		cidade1.ligacoes.add(new Ligacao(cidade1, cidade2, horas));
-	}
-		
-	@Override
-	public void imprimeLigacoes() {
-		for (Cidade cidade : cidades) {
-			LinkedList<Ligacao> ligacoes = cidade.ligacoes;
-
-			if (ligacoes.isEmpty()) {
-				System.out.println("A Cidade " + cidade.getNome() + " não tem voos disponíveis.");
-				continue;
-			}
-			for (Ligacao ligacao : ligacoes) {
-				System.out.print("A cidade de " +cidade.getNome()+ " tem voo para " + ligacao.getDestino().getNome() + " // Duração do Voo: " + ligacao.getHoras() + " hora(s) \n");
+	public void encontraMenorCaminho(Cidade origem){
+		origem.setDistanciaMinima(0.0);
+		queueCidade.add(origem);
+		while (!queueCidade.isEmpty()) {
+			Cidade c = queueCidade.poll();
+			for (Ligacao l : c.getLigacoes()) {
+				Cidade destino = l.getDestino();
+				double peso = l.getHoras();
+				double distanciaAtravesC = peso + c.getDistanciaMinima();
+				if(distanciaAtravesC < destino.getDistanciaMinima()) {
+					destino.setDistanciaMinima(distanciaAtravesC);
+					destino.setCidadeAnterior(c);
+					queueCidade.remove(destino);
+					queueCidade.add(destino);
+				}
 			}
 		}
 	}
-		
 	@Override
-	public boolean temLigacao(Cidade origem, Cidade destino) {
-		LinkedList<Ligacao> ligacoes = origem.ligacoes;
-		for (Ligacao ligacao : ligacoes) {
-			if (ligacao.getDestino() == destino){ 
-			return true;
-			}
+	public List<Cidade> criarCaminho(Cidade destino){
+		List<Cidade> caminho = new ArrayList<Cidade>();
+		for (Cidade c = destino; c!=null; c=c.getCidadeAnterior()) {
+			caminho.add(c);
 		}
-		return false;
-	}
-		
-	@Override	
-	public void encontraMenorCaminho(Cidade origem, Cidade destino) {
-	
+		Collections.reverse(caminho);
+		return caminho;
 	}
 	
-	private Cidade cidadeVizinhaPorVisitar(HashMap<Cidade, Double> caminhoMaisCurto) {
-
-		double menorDistancia = 1000000000000000.0;
-		Cidade cidadeMaisProxima = null;
-
-		for (Cidade cidade : cidades) {
-			if (cidade.isFoiVisitado()) {
-				continue;
-			}
-			double distanciaAtual = caminhoMaisCurto.get(cidade);
-			if (distanciaAtual == 1000000000000000.0) {
-				continue;
-			}
-			if (menorDistancia > distanciaAtual) {
-				menorDistancia = distanciaAtual;
-				cidadeMaisProxima = cidade;
-			}
-		}
-		return cidadeMaisProxima;
-	}
-
 }
