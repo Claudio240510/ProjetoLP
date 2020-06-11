@@ -90,8 +90,9 @@ import java.util.Set;
 	public boolean temLigacao(Cidade origem, Cidade destino) {
 		LinkedList<Ligacao> ligacoes = origem.ligacoes;
 		for (Ligacao ligacao : ligacoes) {
-			if (ligacao.getDestino() == destino) 
-			return true;		
+			if (ligacao.getDestino() == destino){ 
+			return true;
+			}
 		}
 		return false;
 	}
@@ -107,13 +108,13 @@ import java.util.Set;
 		Cidade cidadeMaisProxima = null;
 
 		for (Cidade cidade : cidades) {
-			if (cidade.isFoiVisitado())
+			if (cidade.isFoiVisitado()) {
 				continue;
-
+			}
 			double distanciaAtual = caminhoMaisCurto.get(cidade);
-			if (distanciaAtual == 1000000000000000.0)
+			if (distanciaAtual == 1000000000000000.0) {
 				continue;
-
+			}
 			if (menorDistancia > distanciaAtual) {
 				menorDistancia = distanciaAtual;
 				cidadeMaisProxima = cidade;
