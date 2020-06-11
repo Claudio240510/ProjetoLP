@@ -32,7 +32,7 @@ import java.util.Set;
 
 		adicionaLigacao(origem, destino, horas);
 
-		if (!grafoDirecionado && origem != destino) {
+		if (grafoDirecionado && origem == destino) {
 			adicionaLigacao(destino, origem, horas);
 		}
 	}
@@ -69,12 +69,6 @@ import java.util.Set;
 			return true;		
 		}
 		return false;
-	}
-	
-	public void limpaCidadesVisitadas() {
-	for (Cidade cidade : cidades) {
-		cidade.naoVisitado();
-		}
 	}
 		
 	public void encontraMenorCaminho(Cidade origem, Cidade destino) {
