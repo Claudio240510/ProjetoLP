@@ -1,26 +1,12 @@
-public class Ligacao{
+public class Ligacao implements Comparable<Ligacao> {
 
 	protected double horas;
-	private Cidade origem;
 	private Cidade destino;
 
 	// Construtores
-	public Ligacao(Cidade origem, Cidade destino, double horas) {
-		this.origem = origem;
+	public Ligacao(Cidade destino, double horas) {
 		this.destino = destino;
 		this.horas = horas;
-	}
-
-	public Ligacao(Cidade origem, Cidade destino) {
-		this.origem = origem;
-		this.destino = destino;
-		horas = 0;
-	}
-
-	public Ligacao() {
-		origem = null;
-		destino = null;
-		horas = 0;
 	}
 
 	// Getters e setters
@@ -40,19 +26,17 @@ public class Ligacao{
 		return destino;
 	}
 
-	public void setOrigem(Cidade origem) {
-		this.origem = origem;
-	}
-
-	public Cidade getOrigem() {
-		return origem;
-	}
-	
 	@Override
 	public String toString() {
-		return "Ligacao [horas=" + horas + ", origem=" + origem + ", destino=" + destino + "]";
+		return String.format("(%s, %f)", destino.getNome(), horas);
 	}
-	
+
+	public int compareTo(Ligacao outraLigacao) {
+
+		if (this.horas > outraLigacao.horas) {
+			return 1;
+		} else
+			return -1;
+	}
 
 }
-
