@@ -43,6 +43,12 @@ import java.util.Set;
 		cidades.addAll(Arrays.asList(cidade));
 	}
 		
+	@Override	
+	public void removeCidade(Cidade cidade) {
+		cidades.removeAll(Arrays.asList(cidade));
+	}
+
+		
 	@Override
 	public void addLigacao(Cidade origem, Cidade destino, double horas) {
 		cidades.add(origem);
