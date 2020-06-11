@@ -79,11 +79,9 @@ import java.util.Set;
 			if (ligacoes.isEmpty()) {
 				System.out.println("A Cidade " + cidade.getNome() + " não tem voos disponíveis.");
 				continue;
-			}else {
-			System.out.print("A Cidade " + cidade.getNome() + " tem voo para ");
 			}
 			for (Ligacao ligacao : ligacoes) {
-				System.out.print(ligacao.getDestino().getNome() + " Duração Voo: " + ligacao.getHoras() + " horas  ");
+				System.out.print("A cidade de " +cidade.getNome()+ " tem voo para " + ligacao.getDestino().getNome() + " // Duração do Voo: " + ligacao.getHoras() + " hora(s) \n");
 			}
 		}
 	}
