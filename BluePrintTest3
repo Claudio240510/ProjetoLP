@@ -15,6 +15,15 @@ blueprint:
         target:
           entity:
             domain: light
+    brightness_trigger:
+      name: Maximum brightness
+      description: Brightness trigger level. If it gets any brighter the lights will not be turned on.
+      default: 20
+      selector:
+        number:
+          min: 0
+          max: 1000
+          unit_of_measurement: lx
     no_motion_wait:
       name: Wait time
       description: Time to leave the light on after last motion is detected.
@@ -69,6 +78,8 @@ condition:
 action:
   - service: light.turn_on
     target: !input light_target
+    data:
+      brightness: 50
   - wait_for_trigger:
       platform: state
       entity_id: !input motion_entity
