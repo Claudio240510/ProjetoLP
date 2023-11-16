@@ -2,7 +2,7 @@ blueprint:
   name: Motion-activated Light (only when sun is up and someone at home)
   description: Turn on a light when motion is detected.
   domain: automation
-  source_url: https://community.home-assistant.io/t/motion-activated-light-but-with-conditions/466228/12
+  source_url: https://github.com/Claudio240510/ProjetoLP/blob/master/BlueprintTest
   input:
     motion_entity:
       name: Motion Sensor
