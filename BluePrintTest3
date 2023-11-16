@@ -3,7 +3,7 @@ blueprint:
   description: Turn a light on at sunset or sunrise and off at a specified time
   domain: automation
   input:
-  motion_entity:
+    motion_entity:
       name: Motion Sensor
       selector:
         entity:
