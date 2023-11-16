@@ -45,9 +45,23 @@ blueprint:
           max: 240
           unit_of_measurement: minutes
 
+    offset_time:
+          name: Offset Time
+          description: This sets the offset to the Sunrise / Sunset time
+          default: "00:00:00"
+          selector:
+            time:
+    
+        off_time:
+          name: Off Time
+          description: This sets the time at which the lights shall be turned off
+          default: "23:00:00"
+          selector:
+            time:
+
 # If motion is detected within the delay,
 # we restart the script.
-mode: restart
+mode: once
 max_exceeded: silent
 
 trigger:
@@ -55,6 +69,27 @@ trigger:
   entity_id: !input motion_entity
   from: "off"
   to: "on"
+
+ trigger_selector:
+      name: Sunrise / Sunset
+      default: sunset
+      selector:
+        select:
+          mode: dropdown 
+          options:
+            - label: "Sunset"
+              value: "sunset"
+            - label: "Sunrise"
+              value: "sunrise"
+
+trigger:
+  - platform: sun
+    event: !input trigger_selector
+    offset: !input offset_time
+    id: "1"
+  - platform: time
+    at: !input off_time
+    id: "2"
   
 condition:
   - condition: or
