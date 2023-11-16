@@ -1,9 +1,5 @@
 blueprint:
-  name: Motion-activated Light with illuminance, nightmode and dimmable
-  description: Turn on a light when motion is detected and illuminance is below a
-    set Lux level. The light will dim before it is turned off to signal that it has
-    not detected motion in quite a while. There is also two timers, on for daytime
-    and one for nighttime.
+  name: Motion-activated Light with illuminance, nightmode and dimmable description: Turn on a light when motion is detected and illuminance is below a set Lux level. The light will dim before it is turned off to signal that it has not detected motion in quite a while. There is also two timers, on for daytime and one for nighttime.
   domain: automation
   input:
     motion_entity:
