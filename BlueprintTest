@@ -40,6 +40,14 @@ blueprint:
         entity:
           domain: zone
 
+# Add a condition to ensure that this only triggers near sunset, in the evening
+condition:
+  # Check that it is after sunrise
+  condition: sun
+  after: sunrise
+  # Add a buffer to be sure
+  after_offset: "01:00:00"  
+
 # If motion is detected within the delay,
 # we restart the script.
 mode: restart
