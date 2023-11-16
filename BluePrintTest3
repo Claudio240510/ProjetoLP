@@ -1,103 +1,131 @@
 blueprint:
-  name: Sunset / Sunrise Light
-  description: Turn a light on at sunset or sunrise and off at a specified time
+  name: Motion-activated Light with illuminance, nightmode and dimmable
+  description: Turn on a light when motion is detected and illuminance is below a
+    set Lux level. The light will dim before it is turned off to signal that it has
+    not detected motion in quite a while. There is also two timers, on for daytime
+    and one for nighttime.
   domain: automation
   input:
     motion_entity:
       name: Motion Sensor
       selector:
         entity:
-          domain: binary_sensor
-          device_class: motion
-
+          domain:
+          - binary_sensor
+          device_class:
+          - motion
+          multiple: false
+    lux_entity:
+      name: Illuminance Sensor
+      selector:
+        entity:
+          domain:
+          - sensor
+          device_class:
+          - illuminance
+          multiple: false
+    lux_level:
+      name: Illuminance level
+      description: If lux is below this value and motion is detected, the light will
+        turn on.
+      default: 100
+      selector:
+        number:
+          min: 0.0
+          max: 1000.0
+          step: 1.0
+          mode: slider
     light_target:
       name: Light
       selector:
         target:
           entity:
-            domain: light
-
-    no_motion_wait:
-      name: Wait time
-      description: Time to leave the light on after last motion is detected.
+          - domain:
+            - light
+    dim_time:
+      name: Dim light
+      description: The light will start dim this many seconds before it is turned
+        off if no motion has been detected to signal that the light will soon turn
+        off.
+      default: 30
+      selector:
+        number:
+          min: 0.0
+          max: 120.0
+          unit_of_measurement: seconds
+          step: 1.0
+          mode: slider
+    no_motion_wait_day:
+      name: Wait time (day)
+      description: Time to leave the light on after last motion is detected during
+        the day.
+      default: 300
+      selector:
+        number:
+          min: 0.0
+          max: 600.0
+          unit_of_measurement: seconds
+          step: 1.0
+          mode: slider
+    no_motion_wait_night:
+      name: Wait time (night)
+      description: Time to leave the light on after last motion is detected during
+        the night.
       default: 120
       selector:
         number:
-          min: 0
-          max: 3600
+          min: 0.0
+          max: 600.0
           unit_of_measurement: seconds
-
-    offset_time:
-      name: Offset Time
-      description: This sets the offset to the Sunrise / Sunset time
-      default: "00:00:00"
+          step: 1.0
+          mode: slider
+    night_time_start_helper:
+      name: Night time helper (Start)
+      description: When should it be considered night time? Create an input date time
+        helper and set when you want the night to start.
       selector:
-        time:
-
-    off_time:
-      name: Off Time
-      description: This sets the time at which the lights shall be turned off
-      default: "23:00:00"
+        entity:
+          domain:
+          - input_datetime
+          multiple: false
+    night_time_end_helper:
+      name: Night time helper (End)
+      description: When should it be considered night time? Create an input date time
+        helper and set when you want the night to end.
       selector:
-        time:
-
-    target_light:
-      name: Lights
-      description: The lights to control.
-      selector:
-        target:
-          entity:
-            domain: light
-              
-    trigger_selector:
-      name: Sunrise / Sunset
-      default: sunset
-      selector:
-        select:
-          mode: dropdown 
-          options:
-            - label: "Sunset"
-              value: "sunset"
-            - label: "Sunrise"
-              value: "sunrise"
-
+        entity:
+          domain:
+          - input_datetime
+          multiple: false
+  source_url: https://gist.github.com/Danielbook/ad8dacabb8dc01e7cf062cbd8c1a00ed
+mode: restart
+max_exceeded: silent
+variables:
+  local_night_end: !input night_time_end_helper
+  local_night_start: !input night_time_start_helper
+  local_motion_delay_day: !input no_motion_wait_day
+  local_motion_delay_night: !input no_motion_wait_night
+  local_motion_dim_time: !input dim_time
 trigger:
-  - platform: sun
-    event: !input trigger_selector
-    offset: !input offset_time
-    id: "1"
-  - platform: time
-    at: !input off_time
-    id: "2"
-condition: []
+  platform: state
+  entity_id: !input motion_entity
+  from: 'off'
+  to: 'on'
+condition:
+  condition: numeric_state
+  entity_id: !input lux_entity
+  below: !input lux_level
 action:
-  - choose:
-      - conditions:
-          - condition: trigger
-            id: "1"
-        sequence:
-          - service: light.turn_on
-            data: {}
-            target: !input target_light
-      - conditions:
-          - condition: trigger
-            id: "2"
-        sequence:
-          - service: light.turn_off
-            data: {}
-            target: !input target_light
- - alias: "Turn on the light"
-    service: light.turn_on
-    target: !input light_target
-  - alias: "Wait until there is no motion from device"
-    wait_for_trigger:
-      platform: state
-      entity_id: !input motion_entity
-      from: "on"
-      to: "off"
-  - alias: "Wait the number of seconds that has been set"
-    delay: !input no_motion_wait
-  - alias: "Turn off the light"
-    service: light.turn_off
-    target: !input light_target
-mode: single
+- service: light.turn_on
+  target: !input light_target
+- wait_for_trigger:
+    platform: state
+    entity_id: !input motion_entity
+    from: 'on'
+- delay: ' {% if today_at(states(local_night_end)) < now() or now() < today_at(states(local_night_start))  %}
+    {{ local_motion_delay_day - local_motion_dim_time }} {% else %} {{ local_motion_delay_night
+    - local_motion_dim_time }} {% endif %} '
+- service: light.turn_off
+  target: !input light_target
+  data:
+    transition: !input dim_time
