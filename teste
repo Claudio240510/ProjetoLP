@@ -1,0 +1,65 @@
+blueprint:
+  name: Motion Controlled Lighting
+  description: Turn a light on and off based on detected motion
+  domain: automation
+  input:
+    motion_sensor:
+        name: Motion Sensor
+        description: A sensor that detects motion
+        selector:
+          entity:
+            domain: binary_sensor
+    light:
+        name: Light
+        description: A light that is turned on and off
+        selector:
+          entity:
+            domain: light
+    duration:
+        name: Duration
+        description: How long the light should stay on for, after motion is detected, before turning off (defaults to 30 seconds)
+        default: '0:00:60'
+    offset_time:
+        name: Offset Time
+        description: This sets the offset to the Sunrise / Sunset time
+        default: "00:00:00"
+        selector:
+          time:
+
+    off_time:
+        name: Off Time
+        description: This sets the time at which the lights shall be turned off
+        default: "23:00:00"
+        selector:
+          time:
+
+   trigger_selector:
+        name: Sunrise / Sunset
+        default: sunset
+        selector:
+          select:
+            mode: dropdown 
+            options:
+              - label: "Sunset"
+                value: "sunset"
+              - label: "Sunrise"
+                value: "sunrise"
+
+trigger:
+  - entity_id: !input motion_sensor
+    for: !input duration
+    platform: state
+    to: 'off'
+  - entity_id: !input motion_sensor
+    platform: state
+    to: 'on'
+condition: []
+action:
+  - data:
+      entity_id: '{{light}}'
+    service: 'light.turn_{{mode}}'
+variables:
+  motion: !input motion_sensor
+  light: !input light
+  mode: '{{ states(motion) }}'
+mode: single
