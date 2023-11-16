@@ -1,0 +1,174 @@
+blueprint:
+  name: Scheduled Light Automation
+  description: Turn on the following lights at time
+  domain: automation
+  input:
+    target_light:
+      name: Lights
+      description: This is the light (or lights) that will be activated at sunset
+      selector:
+        target:
+          entity:
+            domain: light
+    target_trigger:
+      name: trigger type
+      description: Choose trigger
+      default: "time"
+      selector:
+        select:
+          options:
+            - "time"
+            - "sunset"
+    trigger_time:
+      name: Manual time
+      description: Time to trigger
+      default: "18:00:00"
+      selector:
+        time:
+    elevation_shift:
+      name: Elevation Shift
+      description:
+        Using an elevation offset (height of sun relative to the horizon)
+        to shift the sunset trigger, either earlier or later. Positive values bring
+        the automation start time forward, whilst negative values delay the start
+        time. To approximate Golden Hour - set the Elevation Offset to 1.
+      default: 0.0
+      selector:
+        number:
+          mode: slider
+          unit_of_measurement: "°"
+          min: -10.0
+          max: 10.0
+          step: 1.0
+    boolean_IsOnlyOn:
+      name: is only turned on light
+      description: Do if you want to turn on only already turned on light
+      default: false
+      selector:
+        boolean:
+    target_color_mode:
+      name: color mode
+      description: Choose the one that your device supports
+      default: "only_brightness"
+      selector:
+        select:
+          options:
+            - "only_brightness"
+            - "color_temp"
+            - "rgb"
+    target_brightness:
+      name: Brightness
+      description: Brightness of the light(s) when they're activated
+      default: 50
+      selector:
+        number:
+          mode: slider
+          unit_of_measurement: "%"
+          min: 5.0
+          max: 100.0
+          step: 5.0
+    target_color_temp:
+      name: color temperature
+      description: kelvin of the light(s) when they're activated
+      default: 4000.0
+      selector:
+        number:
+          mode: slider
+          unit_of_measurement: "K"
+          min: 1700.0
+          max: 6500.0
+          step: 100.0
+    target_rgb:
+      name: rgb color
+      description: example 255,0,0
+      default: "255,183,123"
+      selector:
+        text:
+    target_person:
+      name: Person
+      description: Person/Device that will be tracked.
+      default: "none"
+      selector:
+        entity:
+          domain: person
+    target_device:
+      name: Device
+      description: Device needs to run the official Home Assistant app.
+      default: "none"
+      selector:
+        device:
+          integration: mobile_app
+    target_zone:
+      name: Zone
+      default: "zone.home"
+      selector:
+        entity:
+          domain: zone
+mode: single
+variables:
+  target_light:       !input "target_light"
+  boolean_IsOnlyOn:   !input "boolean_IsOnlyOn"
+  target_color_mode:  !input "target_color_mode"
+  target_brightness:  !input "target_brightness"
+  target_color_temp:  !input "target_color_temp"
+  target_rgb:         !input "target_rgb"
+  target_person:      !input "target_person"
+  target_zone:        !input "target_zone"
+  target_device:      !input "target_device"
+trigger_variables:
+  target_trigger:     !input "target_trigger"
+  trigger_time:       !input "trigger_time"
+  elevation_shift:    !input "elevation_shift"
+trigger:
+  - platform: template
+    value_template: >
+      {% if target_trigger == "time" %}
+        {{ as_timestamp(now())|timestamp_custom('%H:%M') == trigger_time[:-3] }}
+      {% elif target_trigger == "sunset" %}
+        {{ states('sun.sun') == 'above_horizon'
+          and state_attr("sun.sun", "rising") == false
+          and state_attr('sun.sun', 'elevation') <= elevation_shift|int }}
+      {% endif %}
+condition:
+  - condition: template
+    value_template: >
+      {% set state_person = (target_person == 'none' or is_state(target_person, target_zone.split('.')[1])) %}
+      {########################################################################################}
+      {% set state_device = true %}
+      {% set trackable_device = device_entities(target_device)|select('match', 'device_tracker.*')|list %}
+      {% if trackable_device|length > 0 %}
+        {% set state_device = is_state(trackable_device[0], target_zone.split('.')[1]) %}
+      {% endif %}
+      {########################################################################################}
+      {% set state_light = true %}
+      {% if boolean_IsOnlyOn %}
+        {% set result_area_id, result_entity_id, result_device_id = false, false, false %}
+        {% if target_light['area_id'] is defined %}
+          {% set result_area_id = expand(states.light) 
+            |selectattr('state', 'eq', 'on')
+            |selectattr('entity_id', 'in', area_entities(target_light['area_id'])) 
+            |map(attribute='entity_id')
+            |list
+            |length > 0
+          %}
+        {% elif target_light['entity_id'] is defined %}
+          {% set result_entity_id = is_state(target_light['entity_id'], 'on') %}
+        {% elif target_light['device_id'] is defined %}
+          {% set result_device_id = is_state(device_entities(target_light['device_id'])[0], 'on') %}
+        {% endif %}
+        {% set isAtLeastOneLightIsOn = result_area_id or result_entity_id or result_device_id %}
+        {% set state_light = isAtLeastOneLightIsOn %}
+      {% endif %}
+      {########################################################################################}
+      {{ true if state_person and state_device and state_light else false }}
+action:
+  - service: light.turn_on
+    target: "{{ target_light }}"
+    data: >
+      {% if target_color_mode == "only_brightness" %}
+        {{ {'brightness_pct':target_brightness|int} }}
+      {% elif target_color_mode == "color_temp" %}
+        {{ {'brightness_pct':target_brightness|int, 'kelvin':target_color_temp|int} }}
+      {% elif target_color_mode == "rgb" %}
+        {{ {'brightness_pct':target_brightness|int, 'rgb_color':[target_rgb.split(',')[0], target_rgb.split(',')[1], target_rgb.split(',')[2]]} }}
+      {% endif %}
